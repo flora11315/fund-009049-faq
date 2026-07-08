@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>009049 FAQ 助手原型</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #17212b;
+      --muted: #5e6b76;
+      --line: #d9e1e8;
+      --surface: #ffffff;
+      --panel: #f6f8fa;
+      --accent: #166c7d;
+      --accent-strong: #0e5260;
+      --warn: #8a5b00;
+      --ok: #1b6b43;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+      color: var(--ink);
+      background: #eef2f5;
+    }
+    header {
+      border-bottom: 1px solid var(--line);
+      background: var(--surface);
+    }
+    .shell {
+      width: min(1180px, calc(100vw - 32px));
+      margin: 0 auto;
+    }
+    .topbar {
+      min-height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+    .subtitle {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .status-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(140px, 1fr));
+      gap: 1px;
+      border: 1px solid var(--line);
+      background: var(--line);
+      margin: 18px 0;
+    }
+    .metric {
+      background: var(--surface);
+      padding: 12px 14px;
+      min-height: 72px;
+    }
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 7px;
+    }
+    .metric strong {
+      display: block;
+      font-size: 17px;
+      line-height: 1.2;
+      word-break: break-word;
+    }
+    main.shell {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 340px;
+      gap: 18px;
+      padding-bottom: 28px;
+    }
+    section, aside {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+    }
+    .workspace {
+      min-height: 620px;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+    }
+    .section-head {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .section-head h2 {
+      margin: 0;
+      font-size: 15px;
+      letter-spacing: 0;
+    }
+    .quick {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    button {
+      min-height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      padding: 0 12px;
+      background: var(--surface);
+      color: var(--ink);
+      font: inherit;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    button.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #fff;
+    }
+    button:hover { border-color: var(--accent-strong); }
+    button:disabled {
+      cursor: wait;
+      opacity: 0.65;
+    }
+    .messages {
+      padding: 18px;
+      overflow: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .message {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 12px 14px;
+      max-width: 86%;
+      background: #fbfcfd;
+      white-space: pre-wrap;
+      line-height: 1.55;
+    }
+    .message.user {
+      align-self: flex-end;
+      border-color: #bfd5da;
+      background: #edf7f9;
+    }
+    .message.assistant {
+      align-self: flex-start;
+    }
+    .message .meta {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    form {
+      border-top: 1px solid var(--line);
+      padding: 14px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+    }
+    textarea {
+      width: 100%;
+      resize: vertical;
+      min-height: 46px;
+      max-height: 140px;
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      padding: 11px 12px;
+      font: inherit;
+      line-height: 1.45;
+    }
+    aside {
+      display: flex;
+      flex-direction: column;
+      min-height: 620px;
+    }
+    .side-block {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+    .side-block:last-child { border-bottom: 0; }
+    .side-block h3 {
+      margin: 0 0 10px;
+      font-size: 14px;
+    }
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .fact-list {
+      display: grid;
+      gap: 8px;
+      max-height: 280px;
+      overflow: auto;
+    }
+    .fact-item {
+      border-left: 3px solid var(--line);
+      padding-left: 9px;
+      font-size: 13px;
+      line-height: 1.35;
+    }
+    .fact-item span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 3px;
+    }
+    .log {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+    .ok { color: var(--ok); }
+    .warn { color: var(--warn); }
+    @media (max-width: 880px) {
+      .topbar { align-items: flex-start; flex-direction: column; padding: 18px 0; }
+      .status-strip { grid-template-columns: 1fr 1fr; }
+      main.shell { grid-template-columns: 1fr; }
+      .message { max-width: 100%; }
+      form { grid-template-columns: 1fr; }
+      form button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="shell topbar">
+      <div>
+        <h1>009049 基金 FAQ AI 助手原型</h1>
+        <div class="subtitle">易方达高端制造混合发起式A：问答、采集、评测一体化工作台</div>
+      </div>
+      <div class="quick" aria-label="快捷问题">
+        <button type="button" data-question="009049是什么基金？">基本信息</button>
+        <button type="button" data-question="009049最新净值是多少？">最新净值</button>
+        <button type="button" data-question="这只基金现在值得买吗？">合规拒答</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="shell">
+    <div class="status-strip" aria-label="状态指标">
+      <div class="metric"><span>基金代码</span><strong id="fund-code">009049</strong></div>
+      <div class="metric"><span>知识库时点</span><strong id="as-of">读取中</strong></div>
+      <div class="metric"><span>评测准确率</span><strong id="accuracy">未运行</strong></div>
+      <div class="metric"><span>最近采集</span><strong id="collection">未采集</strong></div>
+    </div>
+  </div>
+
+  <main class="shell">
+    <section class="workspace" aria-label="问答工作区">
+      <div class="section-head">
+        <h2>问答测试</h2>
+        <button type="button" id="clear">清空</button>
+      </div>
+      <div class="messages" id="messages">
+        <div class="message assistant">
+          <span class="meta">助手</span>输入一个关于 009049 的问题。回答会尽量包含资料时点、来源和风险提示；涉及买卖建议或收益预测的问题会拒答。
+        </div>
+      </div>
+      <form id="ask-form">
+        <textarea id="question" placeholder="例如：009049最新净值是多少？" required></textarea>
+        <button class="primary" type="submit">提问</button>
+      </form>
+    </section>
+
+    <aside aria-label="控制面板">
+      <div class="section-head">
+        <h2>控制面板</h2>
+      </div>
+      <div class="side-block">
+        <h3>数据操作</h3>
+        <div class="actions">
+          <button type="button" id="collect">采集更新</button>
+          <button type="button" id="eval">运行评测</button>
+        </div>
+      </div>
+      <div class="side-block">
+        <h3>知识条目</h3>
+        <div class="fact-list" id="facts"></div>
+      </div>
+      <div class="side-block">
+        <h3>运行日志</h3>
+        <div class="log" id="log">等待操作。</div>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    const messages = document.querySelector("#messages");
+    const questionInput = document.querySelector("#question");
+    const log = document.querySelector("#log");
+
+    function setBusy(button, busy) {
+      button.disabled = busy;
+      button.dataset.originalText ||= button.textContent;
+      button.textContent = busy ? "处理中" : button.dataset.originalText;
+    }
+
+    function addMessage(role, text, meta) {
+      const node = document.createElement("div");
+      node.className = `message ${role}`;
+      const label = document.createElement("span");
+      label.className = "meta";
+      label.textContent = meta || (role === "user" ? "你" : "助手");
+      node.append(label, text);
+      messages.appendChild(node);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    async function requestJson(url, options = {}) {
+      const response = await fetch(url, {
+        headers: {"Content-Type": "application/json"},
+        ...options
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || `请求失败：${response.status}`);
+      return data;
+    }
+
+    async function loadKnowledge() {
+      const knowledge = await requestJson("/api/knowledge");
+      document.querySelector("#fund-code").textContent = knowledge.fund_code;
+      document.querySelector("#as-of").textContent = knowledge.as_of || "未标注";
+      const last = knowledge.last_collection;
+      document.querySelector("#collection").textContent = last ? last.collected_at.replace("T", " ") : "未采集";
+      const factList = document.querySelector("#facts");
+      factList.innerHTML = "";
+      knowledge.facts.forEach(fact => {
+        const item = document.createElement("div");
+        item.className = "fact-item";
+        item.innerHTML = `${fact.category}<span>${fact.id} · ${fact.date}</span>`;
+        factList.appendChild(item);
+      });
+    }
+
+    async function ask(question) {
+      addMessage("user", question);
+      const data = await requestJson("/api/ask", {
+        method: "POST",
+        body: JSON.stringify({question})
+      });
+      const answer = data.answer;
+      addMessage("assistant", answer.text, `${answer.category} · ${answer.refused ? "已拒答" : "已回答"}`);
+    }
+
+    document.querySelector("#ask-form").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const button = event.submitter;
+      const question = questionInput.value.trim();
+      if (!question) return;
+      setBusy(button, true);
+      try {
+        questionInput.value = "";
+        await ask(question);
+      } catch (error) {
+        addMessage("assistant", error.message, "错误");
+      } finally {
+        setBusy(button, false);
+      }
+    });
+
+    document.querySelectorAll("[data-question]").forEach(button => {
+      button.addEventListener("click", () => {
+        questionInput.value = button.dataset.question;
+        questionInput.focus();
+      });
+    });
+
+    document.querySelector("#clear").addEventListener("click", () => {
+      messages.innerHTML = "";
+      addMessage("assistant", "已清空。可以继续测试新的问题。");
+    });
+
+    document.querySelector("#collect").addEventListener("click", async (event) => {
+      setBusy(event.currentTarget, true);
+      log.textContent = "正在采集公开数据...";
+      try {
+        const data = await requestJson("/api/collect", {method: "POST", body: "{}"});
+        const realtime = data.collected.realtime || {};
+        log.innerHTML = `<span class="ok">采集成功</span>\n净值日期：${realtime.jzrq || "未获取"}\n单位净值：${realtime.dwjz || "未获取"}\n实时估值：${realtime.gsz || "未获取"}`;
+        await loadKnowledge();
+      } catch (error) {
+        log.innerHTML = `<span class="warn">采集失败</span>\n${error.message}`;
+      } finally {
+        setBusy(event.currentTarget, false);
+      }
+    });
+
+    document.querySelector("#eval").addEventListener("click", async (event) => {
+      setBusy(event.currentTarget, true);
+      log.textContent = "正在运行评测...";
+      try {
+        const report = await requestJson("/api/eval");
+        const summary = report.summary;
+        document.querySelector("#accuracy").textContent = `${(summary.accuracy * 100).toFixed(2)}%`;
+        log.innerHTML = `<span class="ok">评测完成</span>\n题数：${summary.total}\n通过：${summary.passed}\n拒答准确率：${(summary.refusal_accuracy * 100).toFixed(2)}%`;
+      } catch (error) {
+        log.innerHTML = `<span class="warn">评测失败</span>\n${error.message}`;
+      } finally {
+        setBusy(event.currentTarget, false);
+      }
+    });
+
+    loadKnowledge().catch(error => {
+      log.innerHTML = `<span class="warn">知识库读取失败</span>\n${error.message}`;
+    });
+  </script>
+</body>
+</html>

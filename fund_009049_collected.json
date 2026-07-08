@@ -1,0 +1,32 @@
+{
+  "fund_code": "009049",
+  "collected_at": "2026-07-08T10:22:34",
+  "sources": [
+    {
+      "id": "eastmoney_realtime",
+      "name": "天天基金实时估值接口",
+      "url": "https://fundgz.1234567.com.cn/js/009049.js"
+    },
+    {
+      "id": "eastmoney_profile_script",
+      "name": "东方财富基金数据脚本",
+      "url": "https://fund.eastmoney.com/pingzhongdata/009049.js"
+    }
+  ],
+  "realtime": {
+    "fundcode": "009049",
+    "name": "易方达高端制造混合发起式A",
+    "jzrq": "2026-07-07",
+    "dwjz": "4.6156",
+    "gsz": "4.5779",
+    "gszzl": "-0.82",
+    "gztime": "2026-07-08 10:18"
+  },
+  "profile": {
+    "fund_name": "易方达高端制造混合发起式A",
+    "fund_code": "009049",
+    "net_worth_latest": {},
+    "accumulated_worth_latest": [],
+    "net_worth_count": 0
+  }
+}
